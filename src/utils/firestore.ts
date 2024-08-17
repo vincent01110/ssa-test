@@ -1,9 +1,13 @@
+import { Secret } from "../types/types.js";
 import db from "./firebase-config.js";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
+import dotenv from "dotenv";
 
-export async function saveSecret(secret: string, expiresIn: number, expiresAfter: number): Promise<string> {
+dotenv.config();
+
+export async function saveSecret(secret: Secret): Promise<string>{
     const collectionRef = collection(db, "secret");
+    const doc = await addDoc(collectionRef, secret);
     
-
-    return "";
+    return `${process.env.API_URL}/secret/${doc.id}`;
 }
