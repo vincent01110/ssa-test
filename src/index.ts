@@ -2,9 +2,9 @@ import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import { SecretPayload } from "./types/types.js";
 import { saveSecret, getSecret } from "./utils/firestore.js";
-import xml from "xml";
 import { validateSecretPayload } from "./utils/utils.js";
 import bodyParser from "body-parser";
+import xml2js from "xml2js";
 
 const app: Express = express();
 
@@ -43,9 +43,11 @@ app.post("/secret", async (req: Request, res: Response) => {
     const accept = req.accepts(["json", "xml"]);
 
     if (accept === "json") {
-      res.json({ secret: result });
+      res.json(result);
     } else if (accept === "xml") {
-      const xmlData = xml({ secret: result });
+      //const xmlData = xml({secret: {...result}});
+      const builder = new xml2js.Builder({headless: false, renderOpts: {pretty: true}});
+      const xmlData = builder.buildObject({Secret: {...result}});
 
       res.type("application/xml");
       res.send(xmlData);
@@ -68,7 +70,7 @@ app.get("/secret/:hash", async (req: Request, res: Response) => {
 
     if (accept === "json") {
       if(!secret){
-        res.status(404).json({ secret: "Secret not found!" });
+        res.status(404).json("Secret not found!");
       } else {
         res.json(secret);
       }
@@ -76,9 +78,10 @@ app.get("/secret/:hash", async (req: Request, res: Response) => {
     } else if (accept === "xml") {
       let xmlData = null;
       if(!secret){
-        xmlData = xml({ secret: "Secret not found!" });
+        xmlData = "Secret not found!"
       } else {
-        xmlData = xml({ secret: secret });
+        const builder = new xml2js.Builder({headless: false, renderOpts: {pretty: true}});
+        xmlData = builder.buildObject({Secret: {...secret}});
       }
       res.type("application/xml");
       res.send(xmlData);

@@ -6,7 +6,6 @@ import {
   query,
   where,
   getDocs,
-  Query,
   updateDoc,
   doc,
   deleteDoc,
@@ -18,14 +17,13 @@ dotenv.config();
 
 export async function saveSecret(
   secretPayload: SecretPayload
-): Promise<string> {
+): Promise<Secret> {
   const secret = secretPayloadToSecret(secretPayload);
 
   const collectionRef = collection(db, "secret");
   const doc = await addDoc(collectionRef, secret);
-
   if (doc.id) {
-    return `${process.env.API_URL}/secret/${secret.hash}`;
+    return secret as Secret;
   } else {
     throw new Error("Error adding data");
   }
@@ -41,7 +39,7 @@ export async function getSecret(hash: string): Promise<Secret | null> {
   const secret = docs.docs[0].data() as Secret;
 
   if (isExpired(secret.expiresAt) || secret.remainingViews < 1) {
-    deleteSecret(docs.docs[0].id);
+    await deleteSecret(docs.docs[0].id);
     return null;
   }
   const updatedSecret = updateSecret(secret, docs.docs[0].id);

@@ -27,7 +27,7 @@ export function secretPayloadToSecret(secretPayload: SecretPayload): Secret {
 }
 
 function getExpiryDate(expiresIn: number): string {
-  if (expiresIn === 0) {
+  if (+expiresIn === 0) {
     return "never";
   } else {
     const now = new Date();
@@ -37,11 +37,8 @@ function getExpiryDate(expiresIn: number): string {
 }
 
 export function isExpired(expiryDate: string): boolean{
+  if(expiryDate == "never") return false;
   const date = new Date();
   const now = date.toLocaleString();
-  console.log(now);
-  
-  console.log(Date.parse(expiryDate) > Date.parse(now));
-  
   return Date.parse(expiryDate) < Date.parse(now);
 }
