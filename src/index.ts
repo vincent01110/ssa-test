@@ -34,8 +34,8 @@ app.post("/secret", async (req: Request, res: Response) => {
     try{
       validateSecretPayload(secret)
     } catch(error:any){
-      console.error(error);
       res.status(405).send(error.message);
+      return;
     }
 
     const result = await saveSecret(secret);
@@ -45,7 +45,6 @@ app.post("/secret", async (req: Request, res: Response) => {
     if (accept === "json") {
       res.json(result);
     } else if (accept === "xml") {
-      //const xmlData = xml({secret: {...result}});
       const builder = new xml2js.Builder({headless: false, renderOpts: {pretty: true}});
       const xmlData = builder.buildObject({Secret: {...result}});
 

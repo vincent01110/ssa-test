@@ -1,8 +1,9 @@
 type SecretPayload = {
     secret: string;
-    expiresIn: number;
     expiresAfter: number;
+    expiresAfterViews: number;
 }
+
 
 type Secret = {
     hash: string;

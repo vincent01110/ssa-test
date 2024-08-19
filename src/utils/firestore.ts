@@ -25,7 +25,7 @@ export async function saveSecret(
   if (doc.id) {
     return secret as Secret;
   } else {
-    throw new Error("Error adding data");
+    throw new Error("Error adding data!");
   }
 }
 
