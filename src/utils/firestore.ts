@@ -9,6 +9,7 @@ import {
   Query,
   updateDoc,
   doc,
+  deleteDoc,
 } from "firebase/firestore";
 import dotenv from "dotenv";
 import { isExpired, secretPayloadToSecret } from "./utils.js";
@@ -39,14 +40,21 @@ export async function getSecret(hash: string): Promise<Secret | null> {
   }
   const secret = docs.docs[0].data() as Secret;
 
-  if (isExpired(secret.expiresAt) || secret.remainingViews < 1) return null;
-
+  if (isExpired(secret.expiresAt) || secret.remainingViews < 1) {
+    deleteSecret(docs.docs[0].id);
+    return null;
+  }
   const updatedSecret = updateSecret(secret, docs.docs[0].id);
   return updatedSecret;
 }
 
-export async function updateSecret(secret: Secret, id: string) {
+async function updateSecret(secret: Secret, id: string): Promise<Secret>{
   const docRef = doc(db, "secret", id);
   await updateDoc(docRef, { remainingViews: secret.remainingViews - 1 });
-  return { ...secret, remainingViews: secret.remainingViews - 1 };
+  return { ...secret, remainingViews: secret.remainingViews - 1 } as Secret;
+}
+
+async function deleteSecret(id: string) {
+  const docRef = doc(db, "secret", id);
+  await deleteDoc(docRef);
 }
