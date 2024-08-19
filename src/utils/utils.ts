@@ -11,7 +11,7 @@ export function validateSecretPayload(secretPayload: SecretPayload) {
   if (!secretPayload.expiresAfterViews) {
     throw new Error("Secret max lookup not defined!");
   }
-  if(+secretPayload.expiresAfterViews < 1){
+  if (+secretPayload.expiresAfterViews < 1) {
     throw new Error("Max lookup must be greater than 0!");
   }
 }
@@ -39,8 +39,8 @@ function getExpiryDate(expiresAfter: number): string {
   }
 }
 
-export function isExpired(expiryDate: string): boolean{
-  if(expiryDate == "never") return false;
+export function isExpired(expiryDate: string): boolean {
+  if (expiryDate == "never") return false;
   const date = new Date();
   const now = date.toLocaleString();
   return Date.parse(expiryDate) < Date.parse(now);

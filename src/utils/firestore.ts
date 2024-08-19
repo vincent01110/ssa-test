@@ -46,7 +46,7 @@ export async function getSecret(hash: string): Promise<Secret | null> {
   return updatedSecret;
 }
 
-async function updateSecret(secret: Secret, id: string): Promise<Secret>{
+async function updateSecret(secret: Secret, id: string): Promise<Secret> {
   const docRef = doc(db, "secret", id);
   await updateDoc(docRef, { remainingViews: secret.remainingViews - 1 });
   return { ...secret, remainingViews: secret.remainingViews - 1 } as Secret;

@@ -12,10 +12,10 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  const contentType = req.headers['content-type'];
-  
-  if (contentType !== 'application/x-www-form-urlencoded') {
-      return res.status(415).send('Unsupported Content Type');
+  const contentType = req.headers["content-type"];
+
+  if (contentType !== "application/x-www-form-urlencoded") {
+    return res.status(415).send("Unsupported Content Type");
   }
 
   next();
@@ -30,10 +30,10 @@ app.get("/hello", (req: Request, res: Response) => {
 app.post("/secret", async (req: Request, res: Response) => {
   try {
     const secret = req.body as SecretPayload;
-    
-    try{
-      validateSecretPayload(secret)
-    } catch(error:any){
+
+    try {
+      validateSecretPayload(secret);
+    } catch (error: any) {
       res.status(405).send(error.message);
       return;
     }
@@ -45,8 +45,11 @@ app.post("/secret", async (req: Request, res: Response) => {
     if (accept === "json") {
       res.json(result);
     } else if (accept === "xml") {
-      const builder = new xml2js.Builder({headless: false, renderOpts: {pretty: true}});
-      const xmlData = builder.buildObject({Secret: {...result}});
+      const builder = new xml2js.Builder({
+        headless: false,
+        renderOpts: { pretty: true },
+      });
+      const xmlData = builder.buildObject({ Secret: { ...result } });
 
       res.type("application/xml");
       res.send(xmlData);
@@ -55,39 +58,39 @@ app.post("/secret", async (req: Request, res: Response) => {
     }
   } catch (error: any) {
     console.error("Error fetching:", error);
-    res.status(500).json({ error: "Failed to fetch", message: error.message});
+    res.status(500).json({ error: "Failed to fetch", message: error.message });
   }
 });
-
 
 app.get("/secret/:hash", async (req: Request, res: Response) => {
   const { hash } = req.params;
   const secret = await getSecret(hash);
-  
-   
+
   const accept = req.accepts(["json", "xml"]);
 
-    if (accept === "json") {
-      if(!secret){
-        res.status(404).json("Secret not found!");
-      } else {
-        res.json(secret);
-      }
-      
-    } else if (accept === "xml") {
-      let xmlData = null;
-      if(!secret){
-        xmlData = "Secret not found!"
-      } else {
-        const builder = new xml2js.Builder({headless: false, renderOpts: {pretty: true}});
-        xmlData = builder.buildObject({Secret: {...secret}});
-      }
-      res.type("application/xml");
-      res.send(xmlData);
+  if (accept === "json") {
+    if (!secret) {
+      res.status(404).json("Secret not found!");
     } else {
-      res.status(405).send("Not Acceptable");
+      res.json(secret);
     }
-})
+  } else if (accept === "xml") {
+    let xmlData = null;
+    if (!secret) {
+      xmlData = "Secret not found!";
+    } else {
+      const builder = new xml2js.Builder({
+        headless: false,
+        renderOpts: { pretty: true },
+      });
+      xmlData = builder.buildObject({ Secret: { ...secret } });
+    }
+    res.type("application/xml");
+    res.send(xmlData);
+  } else {
+    res.status(405).send("Not Acceptable");
+  }
+});
 
 app.listen(port, () => {
   console.log("Listening on port: " + port);
