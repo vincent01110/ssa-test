@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import { SecretPayload } from "./types/types.js";
-import { saveSecret } from "./utils/firestore.js";
+import { saveSecret, getSecret } from "./utils/firestore.js";
 import xml from "xml";
 import { validateSecretPayload } from "./utils/utils.js";
 import bodyParser from "body-parser";
@@ -60,7 +60,31 @@ app.post("/secret", async (req: Request, res: Response) => {
 
 
 app.get("/secret/:hash", async (req: Request, res: Response) => {
+  const { hash } = req.params;
+  const secret = await getSecret(hash);
+  
+   
+  const accept = req.accepts(["json", "xml"]);
 
+    if (accept === "json") {
+      if(!secret){
+        res.status(404).json({ secret: "Secret not found!" });
+      } else {
+        res.json(secret);
+      }
+      
+    } else if (accept === "xml") {
+      let xmlData = null;
+      if(!secret){
+        xmlData = xml({ secret: "Secret not found!" });
+      } else {
+        xmlData = xml({ secret: secret });
+      }
+      res.type("application/xml");
+      res.send(xmlData);
+    } else {
+      res.status(405).send("Not Acceptable");
+    }
 })
 
 app.listen(port, () => {

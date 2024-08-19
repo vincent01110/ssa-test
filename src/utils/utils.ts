@@ -35,3 +35,13 @@ function getExpiryDate(expiresIn: number): string {
     return expiryDate.toLocaleString();
   }
 }
+
+export function isExpired(expiryDate: string): boolean{
+  const date = new Date();
+  const now = date.toLocaleString();
+  console.log(now);
+  
+  console.log(Date.parse(expiryDate) > Date.parse(now));
+  
+  return Date.parse(expiryDate) < Date.parse(now);
+}
