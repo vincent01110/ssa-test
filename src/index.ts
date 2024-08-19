@@ -58,6 +58,11 @@ app.post("/secret", async (req: Request, res: Response) => {
   }
 });
 
+
+app.get("/secret/:hash", async (req: Request, res: Response) => {
+
+})
+
 app.listen(port, () => {
   console.log("Listening on port: " + port);
 });

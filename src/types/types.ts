@@ -4,5 +4,13 @@ type SecretPayload = {
     expiresAfter: number;
 }
 
-export { SecretPayload };
+type Secret = {
+    hash: string;
+    secretText: string;
+    createdAt: string;
+    expiresAt: string;
+    remainingViews: number;
+}
+
+export { SecretPayload, Secret };
 
