@@ -24,7 +24,7 @@ export function secretPayloadToSecret(secretPayload: SecretPayload): Secret {
     secretText: secretPayload.secret,
     createdAt: now.toLocaleString(),
     expiresAt: getExpiryDate(secretPayload.expiresAfter),
-    remainingViews: secretPayload.expiresAfter,
+    remainingViews: secretPayload.expiresAfterViews,
   };
   return secret;
 }

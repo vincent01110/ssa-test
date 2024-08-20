@@ -63,32 +63,40 @@ app.post("/secret", async (req: Request, res: Response) => {
 });
 
 app.get("/secret/:hash", async (req: Request, res: Response) => {
-  const { hash } = req.params;
-  const secret = await getSecret(hash);
+  try {
+    const { hash } = req.params;
 
-  const accept = req.accepts(["json", "xml"]);
+    const secret = await getSecret(hash);
 
-  if (accept === "json") {
-    if (!secret) {
-      res.status(404).json("Secret not found!");
+    const accept = req.accepts(["json", "xml"]);
+
+    if (accept === "json") {
+      if (!secret) {
+        res.status(404).json("Secret not found!");
+      } else {
+        res.json(secret);
+      }
+    } else if (accept === "xml") {
+      let xmlData = null;
+      if (!secret) {
+        xmlData = "Secret not found!";
+        res.type("application/xml");
+        res.status(404).send(xmlData);
+      } else {
+        const builder = new xml2js.Builder({
+          headless: false,
+          renderOpts: { pretty: true },
+        });
+        xmlData = builder.buildObject({ Secret: { ...secret } });
+        res.type("application/xml");
+        res.send(xmlData);
+      }
     } else {
-      res.json(secret);
+      res.status(405).send("Not Acceptable");
     }
-  } else if (accept === "xml") {
-    let xmlData = null;
-    if (!secret) {
-      xmlData = "Secret not found!";
-    } else {
-      const builder = new xml2js.Builder({
-        headless: false,
-        renderOpts: { pretty: true },
-      });
-      xmlData = builder.buildObject({ Secret: { ...secret } });
-    }
-    res.type("application/xml");
-    res.send(xmlData);
-  } else {
-    res.status(405).send("Not Acceptable");
+  } catch (error: any) {
+    console.error("Error fetching:", error);
+    res.status(500).json({ error: "Failed to fetch", message: error.message });
   }
 });
 

@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import dotenv from "dotenv";
 import { isExpired, secretPayloadToSecret } from "./utils.js";
+import { decryptMessage, encryptMessage } from "./crypto.js";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ export async function saveSecret(
   secretPayload: SecretPayload
 ): Promise<Secret> {
   const secret = secretPayloadToSecret(secretPayload);
-
+  secret.secretText = encryptMessage(secret.secretText);
   const collectionRef = collection(db, "secret");
   const doc = await addDoc(collectionRef, secret);
   if (doc.id) {
@@ -49,6 +50,7 @@ export async function getSecret(hash: string): Promise<Secret | null> {
 async function updateSecret(secret: Secret, id: string): Promise<Secret> {
   const docRef = doc(db, "secret", id);
   await updateDoc(docRef, { remainingViews: secret.remainingViews - 1 });
+  secret.secretText = decryptMessage(secret.secretText);
   return { ...secret, remainingViews: secret.remainingViews - 1 } as Secret;
 }
 
