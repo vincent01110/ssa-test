@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express, Request, Response, Router } from "express";
 import cors from "cors";
 import { SecretPayload } from "./types/types.js";
 import { saveSecret, getSecret } from "./utils/firestore.js";
@@ -7,15 +7,16 @@ import bodyParser from "body-parser";
 import xml2js from "xml2js";
 
 const app: Express = express();
+const router: Router = Router();
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
+router.use((req, res, next) => {
   const contentType = req.headers["content-type"];
 
   if (contentType !== "application/x-www-form-urlencoded") {
-    return res.status(415).send("Unsupported Content Type");
+    return res.status(415).json("Unsupported Content Type");
   }
 
   next();
@@ -27,7 +28,7 @@ app.get("/hello", (req: Request, res: Response) => {
   res.send("Hi");
 });
 
-app.post("/secret", async (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response) => {
   try {
     const secret = req.body as SecretPayload;
 
@@ -62,7 +63,7 @@ app.post("/secret", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/secret/:hash", async (req: Request, res: Response) => {
+router.get("/:hash", async (req: Request, res: Response) => {
   try {
     const { hash } = req.params;
 
@@ -99,6 +100,8 @@ app.get("/secret/:hash", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to fetch", message: error.message });
   }
 });
+
+app.use("/v1/secret", router);
 
 app.listen(port, () => {
   console.log("Listening on port: " + port);
