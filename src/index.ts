@@ -11,7 +11,6 @@ import { headerMiddleware } from "./middlewares/header.js";
 import loggerMiddleware from "./middlewares/logger.js";
 
 const app: Express = express();
-const router: Router = Router();
 
 const port = process.env.PORT || 3000;
 
