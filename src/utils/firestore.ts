@@ -1,5 +1,5 @@
 import { Secret, SecretPayload } from "../types/types.js";
-import db from "./firebase-config.js";
+import db from "../configs/firebase-config.js";
 import {
   collection,
   addDoc,
