@@ -5,6 +5,7 @@ import { saveSecret, getSecret } from "./utils/firestore.js";
 import { validateSecretPayload } from "./utils/utils.js";
 import bodyParser from "body-parser";
 import xml2js from "xml2js";
+import functions from "firebase-functions";
 
 const app: Express = express();
 const router: Router = Router();
@@ -22,7 +23,7 @@ router.use((req, res, next) => {
   next();
 });
 
-const port = 8000;
+const port = 3000;
 
 app.get("/hello", (req: Request, res: Response) => {
   res.send("Hi");
@@ -106,3 +107,5 @@ app.use("/v1/secret", router);
 app.listen(port, () => {
   console.log("Listening on port: " + port);
 });
+
+export const api = functions.https.onRequest(app);

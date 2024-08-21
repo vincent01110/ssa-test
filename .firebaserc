@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "ssa-test-b9259",
+    "ssa-api": "ssa-test-b9259"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}
